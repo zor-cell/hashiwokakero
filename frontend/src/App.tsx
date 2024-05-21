@@ -1,24 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect} from 'react';
 import './App.css';
+import Grid from "./classes/grid";
+import Direction from "./classes/direction";
 
 function App() {
+    useEffect(() => {
+       test();
+    }, []);
+
+    function test() {
+        const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+        let grid = new Grid(10, 10, ctx);
+        grid.draw();
+
+        let f = grid.getFirstNeighbors(0, 0);
+
+        grid.draw();
+        console.log("neighbors:", f);
+    }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <canvas id="canvas" width='400px' height='400px'></canvas>
     </div>
   );
 }
