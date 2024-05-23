@@ -1,29 +1,47 @@
-import React, {useEffect} from 'react';
+import React, {BaseSyntheticEvent, useEffect} from 'react';
 import './App.css';
 import Grid from "./classes/grid";
 import Direction from "./classes/direction";
+import GridOptions from "./classes/grid-options";
+import Vector2 from "./classes/vector2";
 
 function App() {
+    let grid: Grid | null = null;
+    const [width, setWidth] = React.useState(800);
+    const [height, setHeight] = React.useState(600);
+
+    const [islandCnt, setIslandCnt] = React.useState(20);
+    const [lineThreshold, setLineThreshold] = React.useState(8);
+
     useEffect(() => {
-       test();
+       start();
     }, []);
 
-    function test() {
+    function start() {
         const canvas = document.getElementById("canvas") as HTMLCanvasElement;
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-        let grid = new Grid(10, 10, ctx);
+        let options: GridOptions = {
+            lineThreshold: lineThreshold
+        }
+        grid = new Grid(width, height, ctx, options);
         grid.draw();
+    }
 
-        let f = grid.getFirstNeighbors(0, 0);
+    function canvasClick(event: React.MouseEvent) {
+        if(grid == null) return;
+        const canvas = event.target as HTMLCanvasElement;
+        const bounds = canvas.getBoundingClientRect();
 
-        grid.draw();
-        console.log("neighbors:", f);
+        let x = event.clientX - bounds.left;
+        let y = event.clientY - bounds.top;
+
+        grid.mouseClick(new Vector2(x, y));
     }
 
   return (
     <div className="App">
-      <canvas id="canvas" width='400px' height='400px'></canvas>
+      <canvas id="canvas" width={width} height={height} onClick={canvasClick}></canvas>
     </div>
   );
 }
