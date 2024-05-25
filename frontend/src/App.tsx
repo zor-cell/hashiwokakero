@@ -1,7 +1,6 @@
-import React, {BaseSyntheticEvent, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import Grid from "./classes/grid";
-import Direction from "./classes/direction";
 import GridOptions from "./classes/grid-options";
 import Vector2 from "./classes/vector2";
 

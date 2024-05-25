@@ -250,15 +250,17 @@ class Grid {
             if(onLine) {
                 //check bridge intersection
                 let valid = true;
-                /*for(let other of this.currentBridges) {
-                    if(other.equals(bridge)) continue;
+                for(let other of this.currentBridges) {
+                    //discard bridges starting or ending in the same node
+                    if(other.equals(bridge) || bridge.start.equals(other.start) || bridge.end.equals(other.end) || bridge.start.equals(other.end) || bridge.end.equals(other.start)) continue;
 
-                    if(Vector2.intersects(bridge.start.pos, bridge.end.pos, other.start.pos, other.end.pos)) {
+                    //check intersection with bridge
+                    if (Vector2.intersects(bridge.start.pos, bridge.end.pos, other.start.pos, other.end.pos)) {
                         valid = false;
-                        console.log("intersects: ", other);
+                        console.log("intersect", other);
                         break;
                     }
-                }*/
+                }
 
                 if(valid) {
                     bridge.incrementWeight();
