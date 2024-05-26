@@ -1,5 +1,5 @@
 interface GridOptions {
-    //islandCnt: number;
+    islandCnt: number;
     //cellRadius: number;
     lineThreshold: number;
 }

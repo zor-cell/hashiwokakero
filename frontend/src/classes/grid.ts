@@ -5,6 +5,7 @@ import Bridge from "./bridge";
 import Vector2 from "./vector2";
 import GridOptions from "./grid-options";
 import Colors from "./colors";
+import {bindReporter} from "web-vitals/dist/modules/lib/bindReporter";
 
 class Grid {
     static readonly CELL_RADIUS: number = 30;
@@ -36,6 +37,8 @@ class Grid {
         this.initGrid();
 
         this.possibleBridges = this.getPossibleBridges();
+
+        this.draw();
     }
 
     private initGrid(): void {
@@ -47,23 +50,83 @@ class Grid {
             }
         }
 
-        for(let c = 1;c <= 20;c++) {
-            let i = Math.floor(Math.random() * (this.rows - 2) + 1);
-            let j = Math.floor(Math.random() * (this.cols - 2) + 1);
+        this.createValidGrid();
+        this.computeBridgeCounts();
+        this.currentBridges = [];
 
-            let island = new Island(c);
-
-            if(this.grid[i][j] == null) {
-                this.grid[i][j] = island;
-
-                let cell = new Cell(i, j, Grid.CELL_RADIUS / 2, island);
-                this.cells.push(cell);
-            }
-        }
+        console.log(this.grid)
     }
 
     private createValidGrid(): void {
+        let cells: Cell[] = [];
+        let bridges: Bridge[] = [];
 
+        let i = Math.floor(this.rows / 2);//Math.floor(Math.random() * (this.rows - 2) + 1);
+        let j = Math.floor(this.cols / 2);//Math.floor(Math.random() * (this.cols - 2) + 1);
+
+        let start = new Cell(i, j, Grid.CELL_RADIUS / 2, new Island(-1));
+        if(start.i >= 0 && start.i < this.rows && start.j >= 0 && start.j < this.cols) this.grid[start.i][start.j] = start.island;
+        let first = Cell.deepCopy(start);
+        let prev: Cell | null = null;
+
+        cells.push(Cell.deepCopy(start));
+
+        let directions = [Direction.D1, Direction.D2, Direction.D3, Direction.D4, Direction.D5, Direction.D6]
+        for(let c = 1;c <= this.options.islandCnt;c++) {
+            let dirIndex = Math.floor(Math.random() * directions.length);
+            let dir = directions[dirIndex];
+
+            if(!(start.i >= 0 && start.i < this.rows && start.j >= 0 && start.j < this.cols)) continue;
+            start = this.getAdjacentNeighbor(start.i, start.j, dir);
+            start.computeCanvasPosition();
+            start.island = new Island(-1);
+            if(start.i >= 0 && start.i < this.rows && start.j >= 0 && start.j < this.cols) this.grid[start.i][start.j] = start.island;
+
+            cells.push(Cell.deepCopy(start));
+            let randWeight = Math.random() < 0.5 ? 1 : 2;
+            if(prev != null) {
+                let bridge = new Bridge(prev, start, randWeight);
+
+                let found = false;
+                for(let b of bridges) {
+                    if(b.equals(bridge)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found) bridges.push(bridge);
+            } else {
+                bridges.push(new Bridge(first, start, randWeight));
+            }
+
+            prev = Cell.deepCopy(start);
+        }
+
+        for(let cell of cells) {
+            this.grid[i][j] = cell.island;
+        }
+        this.cells = cells;
+        this.currentBridges = [...bridges];
+
+        //create random cells
+        //connect isolated components
+        //generate minimum spanning tree
+        //(add random edges from possible bridges)
+    }
+
+    private computeBridgeCounts(): void {
+        for(let cell of this.cells) {
+            let cnt = 0;
+            for (let bridge of this.currentBridges) {
+                if(bridge.start.equals(cell) || bridge.end.equals(cell)) {
+                    cnt += bridge.weight;
+                }
+            }
+            if(cell.island) {
+                cell.island.bridgeCnt = cnt;
+                if(cell.i >= 0 && cell.i < this.rows && cell.j >= 0 && cell.j < this.cols) this.grid[cell.i][cell.j]!.bridgeCnt = cnt;
+            }
+        }
     }
 
     private drawLines(i: number, j: number) {
@@ -127,7 +190,7 @@ class Grid {
             this.ctx.lineWidth = Colors.HOVER_LINE_WIDTH;
             this.ctx.strokeStyle = Colors.HOVER_COLOR;
         } else {
-            if(this.currentBridges.indexOf(bridge) == -1) this.currentBridges.push(bridge);
+            if(bridge.indexOfArray(this.currentBridges) === -1) this.currentBridges.push(bridge);
 
             if (bridge.weight == 1) {
                 this.ctx.moveTo(startPos.x, startPos.y);
@@ -150,7 +213,7 @@ class Grid {
                 this.ctx.lineWidth = Colors.BRIDGE_LINE_WIDTH;
                 this.ctx.strokeStyle = Colors.BRIDGE_COLOR;
             } else {
-                let index = this.currentBridges.indexOf(bridge);
+                let index = bridge.indexOfArray(this.currentBridges);
                 if(index != -1) this.currentBridges.splice(index, 1);
             }
         }
@@ -257,12 +320,15 @@ class Grid {
                     //check intersection with bridge
                     if (Vector2.intersects(bridge.start.pos, bridge.end.pos, other.start.pos, other.end.pos)) {
                         valid = false;
-                        console.log("intersect", other);
                         break;
                     }
                 }
 
                 if(valid) {
+                    let currentIndex = bridge.indexOfArray(this.currentBridges);
+                    if(currentIndex !== -1) {
+                        bridge = this.currentBridges[currentIndex];
+                    }
                     bridge.incrementWeight();
                     this.drawBridge(bridge);
                     break;
@@ -391,6 +457,7 @@ class Grid {
         if(cur.i == -1 && cur.j == -1) return null;
 
         while(cur.island === null) {
+            if(cur.i < 0 || cur.i > this.rows - 1 || cur.j < 0 || cur.j > this.cols - 1) break;
             cur = this.getAdjacentNeighbor(cur.i, cur.j, d);
             if(cur.i == -1 && cur.j == -1) return null;
         }

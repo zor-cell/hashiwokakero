@@ -5,13 +5,11 @@ class Bridge {
     start: Cell;
     end: Cell;
     weight: number;
-    state: BridgeState;
 
     constructor(start: Cell, end: Cell, weight: number = 0) {
         this.start = start;
         this.end = end;
         this.weight = weight;
-        this.state = BridgeState.INACTIVE
     }
 
     incrementWeight(increment: number = 1): void {
@@ -25,6 +23,16 @@ class Bridge {
 
         return (this.start.equals(other.start) && this.end.equals(other.end))
             || (this.end.equals(other.start) && this.start.equals(other.end));
+    }
+
+    indexOfArray(bridges: Bridge[]) {
+        for(let i = 0;i < bridges.length;i++) {
+            if(this.equals(bridges[i])) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
 

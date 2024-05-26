@@ -2,11 +2,13 @@ import Bridge from "./bridge";
 
 class Island {
     bridgeCnt: number;
-    bridges: Bridge[];
 
-    constructor(bridgeCnt: number, bridges: Bridge[] = new Array(bridgeCnt)) {
+    constructor(bridgeCnt: number) {
         this.bridgeCnt = bridgeCnt;
-        this.bridges = bridges;
+    }
+
+    static deepCopy(island: Island) {
+        return new Island(island.bridgeCnt)
     }
 }
 

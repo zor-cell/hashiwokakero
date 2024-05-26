@@ -27,6 +27,10 @@ class Cell {
 
         return this.i == other.i && this.j == other.j;
     }
+
+    static deepCopy(cell: Cell) {
+        return new Cell(cell.i, cell.j, cell.r, cell.island == null ? null : Island.deepCopy(cell.island));
+    }
 }
 
 export default Cell;
