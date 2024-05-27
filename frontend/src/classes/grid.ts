@@ -7,9 +7,18 @@ import GridOptions from "./grid-options";
 
 type OptionalCell = Cell | null;
 
+//TODO
+//line width according to cell radius
+//bridge offset according to cell radius
+//make grid zoomable
+//(change from 2d array to list, finding neighbor with isNeighbor() instead of going through all neighbors between)
+//save games (maybe save hash to localstorage)
+//winning popup
+//random seed?
+
 class Grid {
     private readonly options: GridOptions;
-    static readonly CELL_RADIUS = 30;
+    static CELL_RADIUS: number = 20;
     static readonly ANGLE = 2 * Math.PI / 6;
 
     private readonly rows: number;
@@ -24,14 +33,18 @@ class Grid {
     private allBridges: Bridge[];
 
     constructor(canvas: HTMLCanvasElement, options: GridOptions) {
+        Grid.CELL_RADIUS = Math.floor(options.cellRadius);
+
         this.options = options;
         this.width = canvas.width;
         this.height = canvas.height;
         this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
         this.ctx.scale(this.options.scale, this.options.scale);
 
-        this.rows = Math.floor(this.height / (Grid.CELL_RADIUS * 2)) + 2;
-        this.cols = Math.floor(this.width / (Grid.CELL_RADIUS * 2)) + 6;
+        this.rows = Math.floor(this.height / (Grid.CELL_RADIUS + Grid.CELL_RADIUS * Math.sin(Grid.ANGLE))); //Math.floor(this.height / (Grid.CELL_RADIUS * 2)) + 2;
+        this.cols = Math.floor(this.width / (Grid.CELL_RADIUS + Grid.CELL_RADIUS * Math.cos(Grid.ANGLE)));//Math.floor(this.width / (Grid.CELL_RADIUS * 2)) + 6;
+
+        console.log(this.rows, (Grid.CELL_RADIUS + Grid.CELL_RADIUS * Math.sin(Grid.ANGLE)));
 
         this.cells = [];
         this.bridges = [];

@@ -9,6 +9,7 @@ function App() {
     const [width, setWidth] = React.useState(400);
     const [height, setHeight] = React.useState(300);
 
+    const [cellRadius, setCellRadius] = React.useState(30);
     const [scale, setScale] = React.useState(1);
     const [islandCnt, setIslandCnt] = React.useState(20);
     const [lineThreshold, setLineThreshold] = React.useState(8);
@@ -37,11 +38,16 @@ function App() {
         setScale(event.target.value);
     }
 
+    function changeCellRadius(event: any) {
+        setCellRadius(event.target.value);
+    }
+
     function generateGrid() {
         const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
         let options: GridOptions = {
             lineThreshold: lineThreshold,
+            cellRadius: cellRadius,
             islandCnt: islandCnt,
             scale: scale
         }
@@ -53,12 +59,16 @@ function App() {
     <div className="App">
         <div className="flex settings">
             <div className="flex">
-                <label htmlFor="islandCnt">Island count:</label>
-                <input name="islandCnt" type="number" min={1} value={islandCnt} onChange={changeIslandCnt}/>
+                <label htmlFor="islandCntInput">Island count:</label>
+                <input name="islandCntInput" type="number" min={1} value={islandCnt} onChange={changeIslandCnt}/>
             </div>
             <div className="flex">
-                <label htmlFor="islandCnt">Scale:</label>
-                <input name="islandCnt" type="number" min={0.1} step={0.1} value={scale} onChange={changeScale}/>
+                <label htmlFor="cellRadiusInput">Cell Radius:</label>
+                <input name="cellRadiusInput" type="number" min={10} value={cellRadius} onChange={changeCellRadius}/>
+            </div>
+            <div className="flex">
+                <label htmlFor="scaleInput">Scale:</label>
+                <input name="scaleInput" type="number" min={0.1} step={0.1} value={scale} onChange={changeScale}/>
             </div>
 
             <button onClick={generateGrid}>Generate</button>
