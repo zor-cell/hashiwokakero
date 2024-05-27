@@ -28,6 +28,7 @@ class Grid {
         this.width = canvas.width;
         this.height = canvas.height;
         this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+        this.ctx.scale(this.options.scale, this.options.scale);
 
         this.rows = Math.floor(this.height / (Grid.CELL_RADIUS * 2)) + 2;
         this.cols = Math.floor(this.width / (Grid.CELL_RADIUS * 2)) + 6;
@@ -45,10 +46,26 @@ class Grid {
         }
 
         this.createValidGrid();
-        this.computeBridgeCnt();
 
-        this.bridges = [];
+        //this.bridges = [];
         this.allBridges = this.getAllBridges();
+
+        //add some random bridges
+        let notUsed = [];
+        for(let bridge of this.allBridges) {
+            let i = this.indexOfArray(bridge, this.bridges);
+            if(i === -1) notUsed.push(new Bridge(bridge.start, bridge.end, Math.random() < 0.5 ? 1 : 2));
+        }
+
+        //console.log(notUsed);
+
+        for(let i = 0;i < Math.floor(notUsed.length / 3);i++) {
+            if(this.intersectsAny(notUsed[i])) this.addBridge(notUsed[i]);
+        }
+
+        this.computeBridgeCnt();
+        //console.log(this.bridges);
+        this.bridges = [];
     }
 
     private createValidGrid() {
@@ -72,6 +89,19 @@ class Grid {
             cell = n;
             this.addCell(Cell.deepCopy(cell));
         }
+    }
+
+    private intersectsAny(bridge: Bridge) {
+        for(let other of this.bridges) {
+            //discard bridges starting or ending in the same node
+            if(other.equals(bridge) || bridge.start.equals(other.start) || bridge.end.equals(other.end) || bridge.start.equals(other.end) || bridge.end.equals(other.start)) continue;
+
+            //check intersection with bridge
+            if (Vector2.intersects(bridge.start.pos, bridge.end.pos, other.start.pos, other.end.pos)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     addCell(cell: Cell) {

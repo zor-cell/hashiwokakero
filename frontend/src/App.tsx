@@ -9,6 +9,7 @@ function App() {
     const [width, setWidth] = React.useState(400);
     const [height, setHeight] = React.useState(300);
 
+    const [scale, setScale] = React.useState(1);
     const [islandCnt, setIslandCnt] = React.useState(20);
     const [lineThreshold, setLineThreshold] = React.useState(8);
 
@@ -32,12 +33,17 @@ function App() {
         setIslandCnt(event.target.value);
     }
 
+    function changeScale(event: any) {
+        setScale(event.target.value);
+    }
+
     function generateGrid() {
         const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
         let options: GridOptions = {
             lineThreshold: lineThreshold,
-            islandCnt: islandCnt
+            islandCnt: islandCnt,
+            scale: scale
         }
         grid = new Grid(canvas, options);
         grid.draw();
@@ -49,6 +55,10 @@ function App() {
             <div className="flex">
                 <label htmlFor="islandCnt">Island count:</label>
                 <input name="islandCnt" type="number" min={1} value={islandCnt} onChange={changeIslandCnt}/>
+            </div>
+            <div className="flex">
+                <label htmlFor="islandCnt">Scale:</label>
+                <input name="islandCnt" type="number" min={0.1} step={0.1} value={scale} onChange={changeScale}/>
             </div>
 
             <button onClick={generateGrid}>Generate</button>
