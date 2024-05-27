@@ -1,18 +1,20 @@
-import Island from "./island";
 import Vector2 from "./vector2";
 
 class Cell {
     i: number;
     j: number;
     r: number;
-    island: Island | null;
+    empty: boolean;
+    bridgeCnt: number;
     pos: Vector2;
 
-    constructor(i: number, j: number, r: number, island: Island | null) {
+
+    constructor(i: number, j: number, r: number, bridgeCnt: number = 0, empty: boolean = false) {
         this.i = i;
         this.j = j;
         this.r = r;
-        this.island = island;
+        this.bridgeCnt = bridgeCnt;
+        this.empty = empty;
 
         this.pos = this.computeCanvasPosition();
     }
@@ -29,7 +31,7 @@ class Cell {
     }
 
     static deepCopy(cell: Cell) {
-        return new Cell(cell.i, cell.j, cell.r, cell.island == null ? null : Island.deepCopy(cell.island));
+        return new Cell(cell.i, cell.j, cell.r, cell.bridgeCnt, cell.empty);
     }
 }
 

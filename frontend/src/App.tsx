@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
 import './App.css';
-import Grid from "./classes/grid";
 import GridOptions from "./classes/grid-options";
 import Vector2 from "./classes/vector2";
+import Grid from "./classes/grid";
 
 function App() {
     let grid: Grid | null = null;
     const [width, setWidth] = React.useState(400);
-    const [height, setHeight] = React.useState(400);
+    const [height, setHeight] = React.useState(300);
 
     const [islandCnt, setIslandCnt] = React.useState(20);
     const [lineThreshold, setLineThreshold] = React.useState(8);
@@ -34,28 +34,27 @@ function App() {
 
     function generateGrid() {
         const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
         let options: GridOptions = {
             lineThreshold: lineThreshold,
             islandCnt: islandCnt
         }
-        grid = new Grid(width, height, ctx, options);
+        grid = new Grid(canvas, options);
         grid.draw();
     }
 
   return (
     <div className="App">
-        <div className="settings">
-            <label>
-                Island count: <input type="number" value={islandCnt} onChange={changeIslandCnt}/>
-            </label>
+        <div className="flex settings">
+            <div className="flex">
+                <label htmlFor="islandCnt">Island count:</label>
+                <input name="islandCnt" type="number" min={1} value={islandCnt} onChange={changeIslandCnt}/>
+            </div>
 
             <button onClick={generateGrid}>Generate</button>
-
         </div>
 
-      <canvas id="canvas" width={width} height={height} onClick={canvasClick}></canvas>
+        <canvas id="canvas" width={width + 'px'} height={height + 'px'} onClick={canvasClick}></canvas>
     </div>
   );
 }
