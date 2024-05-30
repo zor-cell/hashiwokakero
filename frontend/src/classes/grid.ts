@@ -2,7 +2,7 @@ import Bridge from "./bridge";
 import Cell from "./cell";
 import Direction from "./direction";
 import Vector2 from "./vector2";
-import Colors from "./colors";
+import Options from "./options";
 import GridOptions from "./grid-options";
 
 type OptionalCell = Cell | null;
@@ -124,14 +124,6 @@ class Grid {
         let index = this.indexOfArray(cell, this.cells);
         if(index === -1) this.cells.push(cell);
         else this.cells[index] = cell;
-    }
-
-    removeCell(cell: Cell) {
-        let index = this.indexOfArray(cell, this.cells);
-        if(index !== -1) {
-            this.grid[cell.i][cell.j].empty = true;
-            this.cells.splice(index, 1);
-        }
     }
 
     addBridge(bridge: Bridge) {
@@ -257,8 +249,8 @@ class Grid {
 
         this.ctx.closePath();
 
-        this.ctx.lineWidth = Colors.BACKGROUND_LINE_WIDTH;
-        this.ctx.strokeStyle = Colors.BACKGROUND_COLOR;
+        this.ctx.lineWidth = Options.BACKGROUND_LINE_WIDTH;
+        this.ctx.strokeStyle = Options.BACKGROUND_COLOR;
         this.ctx.stroke();
     }
 
@@ -271,8 +263,8 @@ class Grid {
             this.ctx.moveTo(startPos.x, startPos.y);
             this.ctx.lineTo(endPos.x, endPos.y);
 
-            this.ctx.lineWidth = Colors.HOVER_LINE_WIDTH;
-            this.ctx.strokeStyle = Colors.HOVER_COLOR;
+            this.ctx.lineWidth = Options.HOVER_LINE_WIDTH;
+            this.ctx.strokeStyle = Options.HOVER_COLOR;
         } else {
             if(bridge.weight > 0) this.addBridge(bridge);
 
@@ -280,10 +272,10 @@ class Grid {
                 this.ctx.moveTo(startPos.x, startPos.y);
                 this.ctx.lineTo(endPos.x, endPos.y);
 
-                this.ctx.lineWidth = Colors.BRIDGE_LINE_WIDTH;
-                this.ctx.strokeStyle = Colors.BRIDGE_COLOR;
+                this.ctx.lineWidth = Options.BRIDGE_LINE_WIDTH;
+                this.ctx.strokeStyle = Options.BRIDGE_COLOR;
             } else if (bridge.weight == 2) {
-                let offset = endPos.minus(startPos).normalVector().unitVector().multiplyScalar(3);
+                let offset = endPos.minus(startPos).normalVector().unitVector().multiplyScalar(Grid.CELL_RADIUS / 8);
                 let leftStartPos = startPos.plus(offset);
                 let leftEndPos = endPos.plus(offset);
                 this.ctx.moveTo(leftStartPos.x, leftStartPos.y);
@@ -294,8 +286,8 @@ class Grid {
                 this.ctx.moveTo(rightStartPos.x, rightStartPos.y);
                 this.ctx.lineTo(rightEndPos.x, rightEndPos.y);
 
-                this.ctx.lineWidth = Colors.BRIDGE_LINE_WIDTH;
-                this.ctx.strokeStyle = Colors.BRIDGE_COLOR;
+                this.ctx.lineWidth = Options.BRIDGE_LINE_WIDTH;
+                this.ctx.strokeStyle = Options.BRIDGE_COLOR;
             } else {
                 this.removeBridge(bridge);
             }
@@ -321,11 +313,11 @@ class Grid {
             }
         }
         if(cnt === cell.bridgeCnt) {
-            this.ctx.fillStyle = Colors.CELL_FULL_COLOR;
+            this.ctx.fillStyle = Options.CELL_FULL_COLOR;
         } else if(cnt > 0) {
-            this.ctx.fillStyle = Colors.CELL_ACTIVE_COLOR;
+            this.ctx.fillStyle = Options.CELL_ACTIVE_COLOR;
         } else {
-            this.ctx.fillStyle = Colors.CELL_EMPTY_COLOR;
+            this.ctx.fillStyle = Options.CELL_EMPTY_COLOR;
         }
 
         //render hexagon
@@ -336,14 +328,14 @@ class Grid {
         this.ctx.closePath();
 
         this.ctx.fill();
-        this.ctx.lineWidth = Colors.CELL_BORDER_LINE_WIDTH;
-        this.ctx.strokeStyle = Colors.CELL_BORDER_COLOR;
+        this.ctx.lineWidth = Options.CELL_BORDER_LINE_WIDTH;
+        this.ctx.strokeStyle = Options.CELL_BORDER_COLOR;
         this.ctx.stroke();
 
         //render text
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillStyle = Colors.CELL_TEXT_COLOR;
+        this.ctx.fillStyle = Options.CELL_TEXT_COLOR;
         this.ctx.fillText(cell.bridgeCnt.toString(), x, y);
     }
 

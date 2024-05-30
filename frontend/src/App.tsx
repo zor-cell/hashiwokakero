@@ -15,8 +15,9 @@ function App() {
     const [lineThreshold, setLineThreshold] = React.useState(8);
 
     useEffect(() => {
-       setWidth(Math.min(window.innerWidth, 800));
-       setHeight(Math.min(window.innerHeight / 2, 400));
+        console.log("update")
+        setWidth(Math.min(window.innerWidth, 800));
+        setHeight(Math.min(window.innerHeight / 2, 400));
     }, []);
 
     function canvasClick(event: React.MouseEvent) {
@@ -64,7 +65,7 @@ function App() {
             </div>
             <div className="flex">
                 <label htmlFor="cellRadiusInput">Cell Radius:</label>
-                <input name="cellRadiusInput" type="number" min={10} value={cellRadius} onChange={changeCellRadius}/>
+                <input name="cellRadiusInput" type="number" min={15} value={cellRadius} onChange={changeCellRadius}/>
             </div>
             <div className="flex">
                 <label htmlFor="scaleInput">Scale:</label>
