@@ -25,7 +25,14 @@ export class Raster {
 
 
     getPartitions(tiles: Tile[]): Set<Tile>[] {
-        let partitions: Set<Tile>[] = [];
+        //do for every tile t in tiles:
+        //  a1 = all tiles with same color, a2 = all tiles with same shape
+        //  do for a:
+        //      find all subsets s of a
+        //      find all permutations p of s
+
+
+        let partitions: Set<Set<Tile>> = new Set<Set<Tile>>();
 
         for(let i = 0;i < tiles.length;i++) {
             let cur = tiles[i];
@@ -34,6 +41,7 @@ export class Raster {
 
             //find all partitions with matching colors and all partitions with matching shape in different iterations
             for(let t = 0;t < 2;t++) {
+                let partition = new Set<Tile>([cur]);
                 for (let j = 0; j < tiles.length && j != i; j++) {
                     let other = tiles[j];
 
@@ -41,6 +49,7 @@ export class Raster {
                         let sameColorMissingShape = color === other.color && (shape & other.shape) === 0;
                         if(sameColorMissingShape) {
                             color |= other.color;
+                            partition.add(other);
                         }
                     } else {
                         let sameShapeMissingColor = shape === other.shape && (color & other.color) === 0;
@@ -49,7 +58,7 @@ export class Raster {
             }
         }
 
-        return partitions;
+        return [];
     }
 
     getLegalPositions(tile: Tile): Set<Position> {
